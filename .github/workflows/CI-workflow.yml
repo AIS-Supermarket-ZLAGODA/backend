@@ -57,4 +57,4 @@ jobs:
           python manage.py test
 
       - name: Build Docker Image (Sanity Check)
-        run: docker build -t ais-backend:latest
+        run: docker build -t ais-backend:latest .
