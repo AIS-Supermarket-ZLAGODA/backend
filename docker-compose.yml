@@ -1,0 +1,45 @@
+name: ais-zlagoda
+
+services:
+  db:
+    image: postgres:17-alpine
+    container_name: ais-db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+      - ./db_init:/docker-entrypoint-initdb.d/
+    environment:
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+    ports:
+      - "5432:5432"
+
+  backend:
+    build: .
+    image: ais-backend:latest
+    container_name: ais-api-server
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    depends_on:
+      - db
+
+  frontend:
+    build: ../frontend
+    command: npm run dev -- --host 0.0.0.0
+    image: ais-frontend:latest
+    container_name: ais-web-app
+    volumes:
+      - ../frontend:/app
+      - /app/node_modules
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
