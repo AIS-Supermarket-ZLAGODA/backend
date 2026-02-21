@@ -36,27 +36,25 @@ jobs:
 
       - name: Install dependencies
         run: |
-          cd backend
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          pip install flake8 pytest  # Додаткові інструменти для CI
+          pip install flake8 pytest
 
       - name: Lint with flake8
-        run: flake8 backend --count --select=E9,F63,F7,F82 --show-source --statistics
+        run: flake8 --exclude venv --count --select=E9,F63,F7,F82 --show-source --statistics
 
       - name: Run Migrations and Tests
         env:
-          DB_NAME: ${{ secrets.DB_NAME }}
-          DB_USER: ${{ secrets.DB_USER }}
-          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          DB_NAME: ais_db
+          DB_USER: postgres
+          DB_PASSWORD: postgres_password
           DB_HOST: localhost
           DB_PORT: 5432
           SECRET_KEY: ${{ secrets.SECRET_KEY }}
           DEBUG: True
-        run: |
-          cd backend
+        run: | 
           python manage.py check
+          python manage.py test
 
       - name: Build Docker Image (Sanity Check)
-        run: |
-          docker build ./backend -t ais-backend:latest
+        run: docker build -t ais-backend:latest .
