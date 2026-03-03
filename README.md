@@ -17,8 +17,8 @@
     ```
    
 ## 📍 Ендпоінти
- - **Swagger UI**: http://localhost:8000/api/docs/ — основне місце для тестування API.
- - **Admin Panel**: http://localhost:8000/admin/
+ - **Swagger UI**: http://localhost:8001/api/docs/ — основне місце для тестування API.
+ - **Admin Panel**: http://localhost:8001/admin/
 
 ## 🏗 Архітектура
  - `repositories/`: Raw SQL запити до бази даних. 
