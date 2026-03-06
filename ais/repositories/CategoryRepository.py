@@ -1,5 +1,6 @@
 from django.db import connection
 
+
 class CategoryRepository:
     @staticmethod
     def get_all():
