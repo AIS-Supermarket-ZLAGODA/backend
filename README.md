@@ -2,13 +2,13 @@
 
 АІС для регулювання роботи продуктового міні-супермаркету. Побудовано з використанням архітектури 3 ярусної архітектури
 
-## 🛠 Технологічний стек
+## Технологічний стек
 - **Framework:** Django 6.0 (DRF)
 - **Database:** PostgreSQL 17
 - **Documentation:** Swagger (drf-spectacular)
 - **Containerization:** Docker
 
-## 🚀 Швидкий запуск
+## Швидкий запуск
 1. **Налаштування оточення**: Скопіюйте `.env.example` та перейменуйте у `.env` та заповніть усі поля
 2. **Збірка та запуск**: 
     ```bash
@@ -16,11 +16,17 @@
     docker-compose up -d
     ```
    
-## 📍 Ендпоінти
+## Ендпоінти
  - **Swagger UI**: http://localhost:8001/api/docs/ — основне місце для тестування API.
  - **Admin Panel**: http://localhost:8001/admin/
+ - **FrontEnd**: http://localhost:5171/
+ - **PostgeSQL**: 5431
 
-## 🏗 Архітектура
+## Архітектура
  - `repositories/`: Raw SQL запити до бази даних. 
  - `services/`: Бізнес-логіка та валідація. 
  - `views/`: Обробка HTTP запитів та документація Swagger.
+
+### Користувачі:
+ - Касир: +380501234567 — dubai_fighter_cashier
+ - Менеджер: +380671234567 — olgya_ua_patiot_manager
