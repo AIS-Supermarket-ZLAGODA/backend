@@ -10,13 +10,13 @@ class CategoryRepository:
 
 
     @staticmethod
-    def create(category_number: int, category_name: str):
+    def create(category_name: str):
         with connection.cursor() as cursor:
             cursor.execute(
-                "INSERT INTO Category (category_number, category_name) VALUES (%s, %s);",
-                [category_number, category_name]
+                "INSERT INTO Category (category_name) VALUES (%s) RETURNING category_number;",
+                [category_name]
             )
-            return category_number
+            return cursor.fetchone()[0]
 
 
     @staticmethod
@@ -44,4 +44,8 @@ class CategoryRepository:
                 "SELECT category_number, category_name FROM Category WHERE category_number = %s;",
                 [category_number]
             )
-            return cursor.fetchone()
+            row = cursor.fetchone()
+            if row:
+                columns = [col[0] for col in cursor.description]
+                return dict(zip(columns, row))
+            return None
