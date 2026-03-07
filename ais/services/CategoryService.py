@@ -1,4 +1,5 @@
 import re
+from django.db import IntegrityError
 from ..repositories.CategoryRepository import CategoryRepository
 
 
@@ -42,4 +43,10 @@ class CategoryService:
 
     def delete_category(self, category_number: int):
         self.get_category_by_number(category_number)
-        self.repository.delete(category_number)
+        try:
+            self.repository.delete(category_number)
+        except IntegrityError:
+            raise ValueError(
+                "This category cannot be deleted because it is used in some products. "
+                "First, delete all products that use this category."
+            )
