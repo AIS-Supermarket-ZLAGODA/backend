@@ -20,9 +20,11 @@ class ProductService:
         self.product_repo = ProductRepository()
         self.category_service = CategoryService()
 
-    def get_list_of_products(self, category_name: str = None):
+    def get_list_of_products(self, category_name: str = None, product_name: str = None):
         if category_name:
             return self.product_repo.get_by_category_name(category_name)
+        if product_name:
+            return self.product_repo.get_by_name(product_name)
         return self.product_repo.get_all()
 
     def get_product_by_id(self, id_product: int):

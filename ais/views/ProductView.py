@@ -12,10 +12,12 @@ class ProductListView(APIView):
         self.service = ProductService()
 
     @extend_schema(responses={200: ProductSerializer(many=True)},
-                   summary="List all products (filter by category_name via query params)")
+                   summary="List all products (filter by category_name or product_name)")
     def get(self, request):
         category_name = request.GET.get('category_name')
-        data = self.service.get_list_of_products(category_name)
+        product_name = request.GET.get('product_name')
+
+        data = self.service.get_list_of_products(category_name=category_name, product_name=product_name)
         return Response(data, status=status.HTTP_200_OK)
 
     @extend_schema(request=ProductSerializer, responses={201: ProductSerializer, 400: dict},

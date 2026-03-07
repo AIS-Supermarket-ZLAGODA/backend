@@ -12,6 +12,21 @@ class ProductRepository:
             columns = [col[0] for col in cursor.description]
             return [dict(zip(columns, row)) for row in cursor.fetchall()]
 
+
+    @staticmethod
+    def get_by_name(product_name: str):
+        with connection.cursor() as cursor:
+            search_pattern = f"%{product_name}%"
+            cursor.execute("""
+                           SELECT id_product, category_number, product_name, producer, characteristics
+                           FROM Product
+                           WHERE product_name ILIKE %s
+                           ORDER BY product_name;
+                           """, [search_pattern])
+            columns = [col[0] for col in cursor.description]
+            return [dict(zip(columns, row)) for row in cursor.fetchall()]
+
+
     @staticmethod
     def get_by_category_name(category_name: str):
         with connection.cursor() as cursor:
@@ -25,6 +40,7 @@ class ProductRepository:
             columns = [col[0] for col in cursor.description]
             return [dict(zip(columns, row)) for row in cursor.fetchall()]
 
+
     @staticmethod
     def create(category_number: int, product_name: str, producer: str, characteristics: str):
         with connection.cursor() as cursor:
@@ -37,10 +53,12 @@ class ProductRepository:
             )
             return cursor.fetchone()[0]
 
+
     @staticmethod
     def delete(id_product: int):
         with connection.cursor() as cursor:
             cursor.execute("DELETE FROM Product WHERE id_product = %s;", [id_product])
+
 
     @staticmethod
     def update(id_product: int, category_number: int, product_name: str, producer: str, characteristics: str):
@@ -53,6 +71,7 @@ class ProductRepository:
                 """,
                 [category_number, product_name, producer, characteristics, id_product]
             )
+
 
     @staticmethod
     def get_by_id(id_product: int):
