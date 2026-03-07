@@ -3,10 +3,10 @@ INSERT INTO Category (category_name) VALUES
 ('Хлібобулочні вироби'),
 ('М''ясо та птиця');
 
-INSERT INTO Product (category_number, product_name, characteristics) VALUES
-(1, 'Молоко 2.5%', 'Пляшка 1л, пастеризоване'),
-(2, 'Хліб білий', 'Нарізний, 500г, вищий гатунок'),
-(3, 'Куряче філе', 'Охолоджене, фасоване по 1кг');
+INSERT INTO Product (category_number, product_name, producer, characteristics) VALUES
+(1, 'Молоко 2.5%', 'Галичина', 'Пляшка 1л, пастеризоване'),
+(2, 'Хліб білий', 'Куліничі', 'Нарізний, 500г, вищий гатунок'),
+(3, 'Куряче філе', 'Наша Ряба', 'Охолоджене, фасоване по 1кг');
 
 INSERT INTO Store_Product (UPC, UPC_prom, id_product, selling_price, products_number, promotional_product) VALUES
 ('123456789012', NULL, 1, 35.50, 50, FALSE),
