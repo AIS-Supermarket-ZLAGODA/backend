@@ -24,6 +24,14 @@ class CategoryService:
     def get_list_of_categories(self):
         return self.repository.get_all()
 
+    def _check_name_unique(self, name: str, exclude_id: int = None):
+        all_categories = self.repository.get_all()
+        for cat in all_categories:
+            if cat['category_name'].lower().strip() == name.lower().strip():
+                if exclude_id and cat['category_number'] == exclude_id:
+                    continue
+                raise ValueError(f"Категорія з назвою '{name}' вже існує!")
+
     def get_category_by_number(self, category_number: int):
         category = self.repository.get_by_number(category_number)
         if not category:
@@ -32,12 +40,14 @@ class CategoryService:
 
     def add_category(self, category_name: str):
         valid_name = _validate_category_name(category_name)
+        self._check_name_unique(valid_name)
         return self.repository.create(valid_name)
 
     def update_category(self, category_number: int, category_name: str):
         self.get_category_by_number(category_number)
 
         valid_name = _validate_category_name(category_name)
+        self._check_name_unique(valid_name, exclude_id=category_number)
 
         self.repository.update(category_number, valid_name)
         return {"category_number": category_number, "category_name": valid_name}

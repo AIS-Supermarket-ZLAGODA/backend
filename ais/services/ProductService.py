@@ -27,6 +27,14 @@ class ProductService:
             return self.product_repo.get_by_name(product_name)
         return self.product_repo.get_all()
 
+    def _check_name_unique(self, name: str, exclude_id: int = None):
+        all_products = self.product_repo.get_all()
+        for prod in all_products:
+            if prod['product_name'].lower().strip() == name.lower().strip():
+                if exclude_id and prod['id_product'] == exclude_id:
+                    continue
+                raise ValueError(f"Товар з назвою '{name}' вже існує!")
+
     def get_product_by_id(self, id_product: int):
         product = self.product_repo.get_by_id(id_product)
         if not product:
@@ -40,6 +48,8 @@ class ProductService:
         valid_producer = _validate_text_field(producer, "Виробник")
         valid_chars = _validate_text_field(characteristics, "Характеристики")
 
+        self._check_name_unique(valid_name)
+
         return self.product_repo.create(category_number, valid_name, valid_producer, valid_chars)
 
     def update_product(self, id_product: int, category_number: int, product_name: str, producer: str,
@@ -51,6 +61,8 @@ class ProductService:
         valid_name = _validate_text_field(product_name, "Назва товару")
         valid_producer = _validate_text_field(producer, "Виробник")
         valid_chars = _validate_text_field(characteristics, "Характеристики")
+
+        self._check_name_unique(valid_name, exclude_id=id_product)
 
         self.product_repo.update(id_product, category_number, valid_name, valid_producer, valid_chars)
 
