@@ -6,11 +6,11 @@ from .CategoryService import CategoryService  # Імпортуємо серві�
 
 def _validate_text_field(text: str, field_name: str) -> str:
     if not text or not text.strip():
-        raise ValueError(f"{field_name} cannot be empty!")
+        raise ValueError(f"Поле '{field_name}' не може бути порожнім!")
 
     pattern = r"^[А-Яа-яІіЇїЄєҐґA-Za-z0-9\s\-',.%]+$"
     if not re.match(pattern, text):
-        raise ValueError(f"{field_name} contains invalid characters.")
+        raise ValueError(f"Поле '{field_name}' містить недопустимі символи.")
 
     return text.strip()
 
@@ -27,18 +27,28 @@ class ProductService:
             return self.product_repo.get_by_name(product_name)
         return self.product_repo.get_all()
 
+    def _check_name_unique(self, name: str, exclude_id: int = None):
+        all_products = self.product_repo.get_all()
+        for prod in all_products:
+            if prod['product_name'].lower().strip() == name.lower().strip():
+                if exclude_id and prod['id_product'] == exclude_id:
+                    continue
+                raise ValueError(f"Товар з назвою '{name}' вже існує!")
+
     def get_product_by_id(self, id_product: int):
         product = self.product_repo.get_by_id(id_product)
         if not product:
-            raise ValueError(f"Product with ID {id_product} not found.")
+            raise ValueError(f"Товар з ID {id_product} не знайдено.")
         return product
 
     def add_product(self, category_number: int, product_name: str, producer: str, characteristics: str):
         self.category_service.get_category_by_number(category_number)
 
-        valid_name = _validate_text_field(product_name, "Product name")
-        valid_producer = _validate_text_field(producer, "Producer")
-        valid_chars = _validate_text_field(characteristics, "Characteristics")
+        valid_name = _validate_text_field(product_name, "Назва товару")
+        valid_producer = _validate_text_field(producer, "Виробник")
+        valid_chars = _validate_text_field(characteristics, "Характеристики")
+
+        self._check_name_unique(valid_name)
 
         return self.product_repo.create(category_number, valid_name, valid_producer, valid_chars)
 
@@ -48,9 +58,11 @@ class ProductService:
 
         self.category_service.get_category_by_number(category_number)
 
-        valid_name = _validate_text_field(product_name, "Product name")
-        valid_producer = _validate_text_field(producer, "Producer")
-        valid_chars = _validate_text_field(characteristics, "Characteristics")
+        valid_name = _validate_text_field(product_name, "Назва товару")
+        valid_producer = _validate_text_field(producer, "Виробник")
+        valid_chars = _validate_text_field(characteristics, "Характеристики")
+
+        self._check_name_unique(valid_name, exclude_id=id_product)
 
         self.product_repo.update(id_product, category_number, valid_name, valid_producer, valid_chars)
 
@@ -68,6 +80,6 @@ class ProductService:
             self.product_repo.delete(id_product)
         except IntegrityError:
             raise ValueError(
-                "This product cannot be deleted because it is currently linked to the store inventory. "
-                "First, remove it from the store."
+                "Цей товар неможливо видалити, оскільки він зараз наявний на складі магазину. "
+                "Спершу видаліть його зі складу магазину."
             )
