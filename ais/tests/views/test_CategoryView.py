@@ -90,7 +90,7 @@ class TestCategoryView(SimpleTestCase):
         self.assertEqual(response.status_code, 400)
 
     @patch('ais.views.CategoryView.CategoryService')
-    def test_category_detail_delete(self):
+    def test_category_detail_delete(self, mock_service_class):
         request = self.factory.delete('/api/categories/1/')
         view = CategoryDetailView.as_view()
         response = view(request, category_number=1)

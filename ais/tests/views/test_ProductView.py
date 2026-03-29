@@ -96,7 +96,7 @@ class TestProductView(SimpleTestCase):
         self.assertEqual(response.status_code, 400)
 
     @patch('ais.views.ProductView.ProductService')
-    def test_product_detail_delete(self):
+    def test_product_detail_delete(self, mock_service_class):
         request = self.factory.delete('/api/products/1/')
         view = ProductDetailView.as_view()
         response = view(request, id_product=1)
