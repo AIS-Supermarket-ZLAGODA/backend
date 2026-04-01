@@ -3,19 +3,6 @@ from django.db import connection
 
 class CheckRepository:
     @staticmethod
-    def get_all():
-        with connection.cursor() as cursor:
-            cursor.execute("""
-                SELECT c.check_number, c.id_employee, c.card_number, c.print_date,
-                       c.sum_total, c.vat, e.empl_surname, e.empl_name
-                FROM "Check" c
-                INNER JOIN Employee e ON c.id_employee = e.id_employee
-                ORDER BY c.print_date DESC;
-            """)
-            columns = [col[0] for col in cursor.description]
-            return [dict(zip(columns, row)) for row in cursor.fetchall()]
-
-    @staticmethod
     def get_by_number(check_number: str):
         with connection.cursor() as cursor:
             cursor.execute("""
@@ -32,16 +19,38 @@ class CheckRepository:
             return None
 
     @staticmethod
-    def get_by_employee(id_employee: str):
+    def get_all(id_employee=None, date_from=None, date_to=None):
         with connection.cursor() as cursor:
-            cursor.execute("""
-                SELECT c.check_number, c.id_employee, c.card_number, c.print_date,
-                       c.sum_total, c.vat, e.empl_surname, e.empl_name
-                FROM "Check" c
-                INNER JOIN Employee e ON c.id_employee = e.id_employee
-                WHERE c.id_employee = %s
-                ORDER BY c.print_date DESC;
-            """, [id_employee])
+            query = """
+                    SELECT c.check_number,
+                           c.id_employee,
+                           c.card_number,
+                           c.print_date,
+                           c.sum_total,
+                           c.vat,
+                           e.empl_surname,
+                           e.empl_name
+                    FROM "Check" c
+                    INNER JOIN Employee e ON c.id_employee = e.id_employee
+                    WHERE 1 = 1 
+                    """
+            params = []
+
+            if id_employee:
+                query += " AND c.id_employee = %s"
+                params.append(id_employee)
+
+            if date_from:
+                query += " AND c.print_date >= %s"
+                params.append(date_from)
+
+            if date_to:
+                query += " AND c.print_date <= %s"
+                params.append(date_to)
+
+            query += " ORDER BY c.print_date DESC;"
+
+            cursor.execute(query, params)
             columns = [col[0] for col in cursor.description]
             return [dict(zip(columns, row)) for row in cursor.fetchall()]
 
@@ -80,6 +89,30 @@ class CheckRepository:
             """, [check_number])
             columns = [col[0] for col in cursor.description]
             return [dict(zip(columns, row)) for row in cursor.fetchall()]
+
+    @staticmethod
+    def get_total_sum(id_employee=None, date_from=None, date_to=None):
+        with connection.cursor() as cursor:
+            query = 'SELECT SUM(sum_total), SUM(vat) FROM "Check" WHERE 1=1'
+            params = []
+
+            if id_employee:
+                query += " AND id_employee = %s"
+                params.append(id_employee)
+            if date_from:
+                query += " AND print_date >= %s"
+                params.append(date_from)
+            if date_to:
+                query += " AND print_date <= %s"
+                params.append(date_to)
+
+            cursor.execute(query, params)
+            result = cursor.fetchone()
+
+            return {
+                "total_sum": result[0] if result[0] is not None else 0,
+                "total_vat": result[1] if result[1] is not None else 0
+            }
 
     @staticmethod
     def generate_check_number():

@@ -10,4 +10,4 @@ class CustomerCardSerializer(serializers.Serializer):
     city = serializers.CharField(max_length=50, required=False, allow_blank=True, allow_null=True)
     street = serializers.CharField(max_length=50, required=False, allow_blank=True, allow_null=True)
     zip_code = serializers.CharField(max_length=9, required=False, allow_blank=True, allow_null=True)
-    percent = serializers.IntegerField()
+    percent = serializers.IntegerField(min_value=0, max_value=100)

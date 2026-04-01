@@ -14,10 +14,12 @@ class CheckService:
         self.store_product_repository = StoreProductRepository()
         self.customer_card_repository = CustomerCardRepository()
 
-    def get_list_of_checks(self, id_employee=None):
-        if id_employee:
-            return self.check_repository.get_by_employee(id_employee)
-        return self.check_repository.get_all()
+    def get_list_of_checks(self, id_employee=None, date_from=None, date_to=None):
+        return self.check_repository.get_all(
+            id_employee=id_employee,
+            date_from=date_from,
+            date_to=date_to
+        )
 
     def get_check_by_number(self, check_number: str):
         check = self.check_repository.get_by_number(check_number)
@@ -101,3 +103,10 @@ class CheckService:
             raise ValueError(
                 "Цей чек неможливо видалити."
             )
+
+    def get_checks_summary(self, id_employee=None, date_from=None, date_to=None):
+        return self.check_repository.get_total_sum(
+            id_employee=id_employee,
+            date_from=date_from,
+            date_to=date_to
+        )

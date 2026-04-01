@@ -15,6 +15,26 @@ class CustomerCardRepository:
             return [dict(zip(columns, row)) for row in cursor.fetchall()]
 
     @staticmethod
+    def get_all_by_percent(percent: int):
+        with connection.cursor() as cursor:
+            cursor.execute("""
+                           SELECT card_number,
+                                  cust_surname,
+                                  cust_name,
+                                  cust_patronymic,
+                                  phone_number,
+                                  city,
+                                  street,
+                                  zip_code,
+                                  percent
+                           FROM Customer_Card
+                           WHERE percent = %s
+                           ORDER BY cust_surname;
+                           """, params=[percent])
+            columns = [col[0] for col in cursor.description]
+            return [dict(zip(columns, row)) for row in cursor.fetchall()]
+
+    @staticmethod
     def get_by_number(card_number: str):
         with connection.cursor() as cursor:
             cursor.execute("""

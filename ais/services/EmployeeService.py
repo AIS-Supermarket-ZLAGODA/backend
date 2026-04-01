@@ -33,7 +33,8 @@ class EmployeeService:
             else:
                 raise ValueError(f"Працівник з номером телефону {phone_number} вже існує.")
 
-    def _validate_date_of_birth(self, date_of_birth):
+    @staticmethod
+    def _validate_date_of_birth(date_of_birth):
         today = date.today()
         age = today.year - date_of_birth.year - (
             (today.month, today.day) < (date_of_birth.month, date_of_birth.day)
@@ -41,7 +42,8 @@ class EmployeeService:
         if age < 18:
             raise ValueError("Працівник повинен бути не молодше 18 років.")
 
-    def _validate_required_fields(self, data: dict):
+    @staticmethod
+    def _validate_required_fields(data: dict):
         required = ['empl_surname', 'empl_name', 'empl_role', 'salary',
                      'date_of_birth', 'date_of_start', 'phone_number',
                      'city', 'street', 'zip_code']
@@ -50,10 +52,25 @@ class EmployeeService:
             if value is None or (isinstance(value, str) and not value.strip()):
                 raise ValueError(f"Поле '{field}' є обов'язковим і не може бути порожнім.")
 
+    @staticmethod
+    def _validate_employment_age(date_of_birth, date_of_start):
+        try:
+            birthday_18 = date_of_birth.replace(year=date_of_birth.year + 18)
+        except ValueError:
+            birthday_18 = date_of_birth.replace(year=date_of_birth.year + 18, day=28)
+
+        if date_of_start < birthday_18:
+            raise ValueError(
+                f"Дата початку роботи ({date_of_start}) не може бути раніше "
+                f"ніж 18-річчя працівника ({birthday_18})."
+            )
+
     def add_employee(self, data: dict):
         self._validate_required_fields(data)
         self._validate_phone(data['phone_number'])
         self._validate_date_of_birth(data['date_of_birth'])
+
+        self._validate_employment_age(data['date_of_birth'], data['date_of_start'])
 
         if not data.get('password'):
             raise ValueError("Пароль є обов'язковим при створенні працівника.")
@@ -67,6 +84,12 @@ class EmployeeService:
         existing = self.repository.get_by_id_public(id_employee)
         if not existing:
             raise ValueError(f"Працівника з ID {id_employee} не знайдено.")
+
+        new_dob = data.get('date_of_birth', existing['date_of_birth'])
+        new_start = data.get('date_of_start', existing['date_of_start'])
+
+        if 'date_of_birth' in data or 'date_of_start' in data:
+            self._validate_employment_age(new_dob, new_start)
 
         if 'phone_number' in data:
             self._validate_phone(data['phone_number'], exclude_id=id_employee)

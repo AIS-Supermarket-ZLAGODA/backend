@@ -3,15 +3,36 @@ from django.db import connection
 
 class StoreProductRepository:
     @staticmethod
-    def get_all():
+    def get_all(product_name=None, is_promotional=None, sort_by_quantity=False):
         with connection.cursor() as cursor:
-            cursor.execute("""
-                SELECT sp.UPC, sp.UPC_prom, sp.id_product, sp.selling_price,
-                       sp.products_number, sp.promotional_product, p.product_name
-                FROM Store_Product sp
-                INNER JOIN Product p ON sp.id_product = p.id_product
-                ORDER BY p.product_name;
-            """)
+            query = """
+                    SELECT sp.upc, 
+                           sp.upc_prom, 
+                           sp.id_product, 
+                           sp.selling_price,
+                           sp.products_number, 
+                           sp.promotional_product, 
+                           p.product_name
+                    FROM Store_Product sp
+                    INNER JOIN Product p ON sp.id_product = p.id_product
+                    WHERE 1 = 1 
+                    """
+            params = []
+
+            if product_name:
+                query += " AND p.product_name ILIKE %s"
+                params.append(f"%{product_name}%")
+
+            if is_promotional is not None:
+                query += " AND sp.promotional_product = %s"
+                params.append(is_promotional)
+
+            if sort_by_quantity:
+                query += " ORDER BY sp.products_number DESC"
+            else:
+                query += " ORDER BY p.product_name ASC"
+
+            cursor.execute(query, params)
             columns = [col[0] for col in cursor.description]
             return [dict(zip(columns, row)) for row in cursor.fetchall()]
 
@@ -19,11 +40,12 @@ class StoreProductRepository:
     def get_by_upc(upc: str):
         with connection.cursor() as cursor:
             cursor.execute("""
-                SELECT sp.UPC, sp.UPC_prom, sp.id_product, sp.selling_price,
-                       sp.products_number, sp.promotional_product, p.product_name
+                SELECT sp.upc, sp.upc_prom, sp.id_product, sp.selling_price,
+                       sp.products_number, sp.promotional_product, p.product_name,
+                       p.characteristics as "characteristics"
                 FROM Store_Product sp
                 INNER JOIN Product p ON sp.id_product = p.id_product
-                WHERE sp.UPC = %s;
+                WHERE sp.upc = %s;
             """, [upc])
             row = cursor.fetchone()
             if row:
@@ -36,7 +58,7 @@ class StoreProductRepository:
         with connection.cursor() as cursor:
             search_pattern = f"%{name}%"
             cursor.execute("""
-                SELECT sp.UPC, sp.UPC_prom, sp.id_product, sp.selling_price,
+                SELECT sp.upc, sp.upc_prom, sp.id_product, sp.selling_price,
                        sp.products_number, sp.promotional_product, p.product_name
                 FROM Store_Product sp
                 INNER JOIN Product p ON sp.id_product = p.id_product
@@ -50,13 +72,13 @@ class StoreProductRepository:
     def create(data: dict):
         with connection.cursor() as cursor:
             cursor.execute("""
-                INSERT INTO Store_Product (UPC, UPC_prom, id_product, selling_price,
+                INSERT INTO Store_Product (upc, upc_prom, id_product, selling_price,
                                            products_number, promotional_product)
                 VALUES (%s, %s, %s, %s, %s, %s)
-                RETURNING UPC;
+                RETURNING upc;
             """, [
-                data['UPC'],
-                data.get('UPC_prom'),
+                data['upc'],
+                data.get('upc_prom'),
                 data['id_product'],
                 data['selling_price'],
                 data['products_number'],
@@ -69,11 +91,11 @@ class StoreProductRepository:
         with connection.cursor() as cursor:
             cursor.execute("""
                 UPDATE Store_Product
-                SET UPC_prom = %s, id_product = %s, selling_price = %s,
+                SET upc_prom = %s, id_product = %s, selling_price = %s,
                     products_number = %s, promotional_product = %s
-                WHERE UPC = %s;
+                WHERE upc = %s;
             """, [
-                data.get('UPC_prom'),
+                data.get('upc_prom'),
                 data['id_product'],
                 data['selling_price'],
                 data['products_number'],
@@ -84,7 +106,7 @@ class StoreProductRepository:
     @staticmethod
     def delete(upc: str):
         with connection.cursor() as cursor:
-            cursor.execute("DELETE FROM Store_Product WHERE UPC = %s;", [upc])
+            cursor.execute("DELETE FROM Store_Product WHERE upc = %s;", [upc])
 
     @staticmethod
     def update_stock(upc: str, quantity_delta: int):
@@ -92,5 +114,5 @@ class StoreProductRepository:
             cursor.execute("""
                 UPDATE Store_Product
                 SET products_number = products_number + %s
-                WHERE UPC = %s;
+                WHERE upc = %s;
             """, [quantity_delta, upc])

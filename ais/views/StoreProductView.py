@@ -3,7 +3,8 @@ from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
-from ..serializers.StoreProductSerializer import StoreProductSerializer
+from ..serializers.StoreProductSerializer import StoreProductSerializer, StoreProductDetailSerializer
+from ..serializers.StoreProductRequestSerializer import StoreProductRequestSerializer
 from ..services.StoreProductService import StoreProductService
 
 
@@ -13,16 +14,24 @@ class StoreProductListView(APIView):
         self.service = StoreProductService()
 
     @extend_schema(
+        parameters=[StoreProductRequestSerializer],
         responses={200: StoreProductSerializer(many=True)},
         summary="List of all store products"
     )
     def get(self, request):
-        product_name = request.query_params.get('product_name')
-        if product_name:
-            data = self.service.search_by_product_name(product_name)
-        else:
-            data = self.service.get_list_of_store_products()
+        query_params = StoreProductRequestSerializer(data=request.query_params)
+        query_params.is_valid(raise_exception=True)
+
+        params = query_params.validated_data
+
+        data = self.service.get_list_of_store_products(
+            product_name=params.get('product_name'),
+            is_promotional=params.get('promotional_product_filter'),
+            sort_by_quantity=params.get('order_by_products_number')
+        )
+
         return Response(data, status=status.HTTP_200_OK)
+
 
     @extend_schema(
         request=StoreProductSerializer,
@@ -47,7 +56,7 @@ class StoreProductDetailView(APIView):
         self.service = StoreProductService()
 
     @extend_schema(
-        responses={200: StoreProductSerializer, 404: dict},
+        responses={200: StoreProductDetailSerializer, 404: dict},
         summary="Get store product by UPC"
     )
     def get(self, request, UPC):
