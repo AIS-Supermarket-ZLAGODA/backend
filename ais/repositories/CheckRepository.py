@@ -91,6 +91,30 @@ class CheckRepository:
             return [dict(zip(columns, row)) for row in cursor.fetchall()]
 
     @staticmethod
+    def get_total_sum(id_employee=None, date_from=None, date_to=None):
+        with connection.cursor() as cursor:
+            query = 'SELECT SUM(sum_total), SUM(vat) FROM "Check" WHERE 1=1'
+            params = []
+
+            if id_employee:
+                query += " AND id_employee = %s"
+                params.append(id_employee)
+            if date_from:
+                query += " AND print_date >= %s"
+                params.append(date_from)
+            if date_to:
+                query += " AND print_date <= %s"
+                params.append(date_to)
+
+            cursor.execute(query, params)
+            result = cursor.fetchone()
+
+            return {
+                "total_sum": result[0] if result[0] is not None else 0,
+                "total_vat": result[1] if result[1] is not None else 0
+            }
+
+    @staticmethod
     def generate_check_number():
         with connection.cursor() as cursor:
             cursor.execute("""

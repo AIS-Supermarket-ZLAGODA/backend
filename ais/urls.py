@@ -6,7 +6,7 @@ from .views.ProductView import ProductListView
 from .views.ProductView import ProductDetailView
 from .views.AuthView import LoginView
 from .views.EmployeeView import EmployeeListView, EmployeeDetailView
-from .views.CheckView import CheckListView, CheckDetailView
+from .views.CheckView import CheckListView, CheckDetailView, CheckSummaryView
 from .views.CustomerCardView import CustomerCardListView, CustomerCardDetailView
 from .views.StoreProductView import StoreProductListView, StoreProductDetailView
 
@@ -20,6 +20,7 @@ urlpatterns = [
     path('employees/', EmployeeListView.as_view(), name='employee-list'),
     path('employees/<str:id_employee>/', EmployeeDetailView.as_view(), name='employee-detail'),
     path('checks/', CheckListView.as_view(), name='check-list'),
+    path('checks/summary/', CheckSummaryView.as_view(), name='check-summary'),
     path('checks/<str:check_number>/', CheckDetailView.as_view(), name='check-detail'),
     path('customers/', CustomerCardListView.as_view(), name='customer-list'),
     path('customers/<str:card_number>/', CustomerCardDetailView.as_view(), name='customer-detail'),

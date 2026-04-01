@@ -103,3 +103,10 @@ class CheckService:
             raise ValueError(
                 "Цей чек неможливо видалити."
             )
+
+    def get_checks_summary(self, id_employee=None, date_from=None, date_to=None):
+        return self.check_repository.get_total_sum(
+            id_employee=id_employee,
+            date_from=date_from,
+            date_to=date_to
+        )

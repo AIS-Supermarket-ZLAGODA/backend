@@ -78,3 +78,27 @@ class CheckDetailView(APIView):
             return Response(status=status.HTTP_204_NO_CONTENT)
         except ValueError as e:
             return Response({"error": str(e)}, status=status.HTTP_404_NOT_FOUND)
+
+
+class CheckSummaryView(APIView):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.service = CheckService()
+
+    @extend_schema(
+        parameters=[CheckRequestSerializer],
+        responses={200: dict},
+        summary="Get total sales sum and VAT summary for a period/employee"
+    )
+    def get(self, request):
+        query_params = CheckRequestSerializer(data=request.query_params)
+        query_params.is_valid(raise_exception=True)
+
+        params = query_params.validated_data
+
+        summary = self.service.get_checks_summary(
+            id_employee=params.get('id_employee'),
+            date_from=params.get('date_from'),
+            date_to=params.get('date_to')
+        )
+        return Response(summary, status=status.HTTP_200_OK)
