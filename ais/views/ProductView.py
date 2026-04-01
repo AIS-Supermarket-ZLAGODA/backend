@@ -4,6 +4,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 
 from ..serializers.ProductSerializer import ProductSerializer
+from ..serializers.ProductStatsSerializer import ProductStatsRequestSerializer, ProductStatsResponseSerializer
 from ..services.ProductService import ProductService
 
 class ProductListView(APIView):
@@ -78,3 +79,25 @@ class ProductDetailView(APIView):
         except ValueError as e:
             status_code = status.HTTP_400_BAD_REQUEST if "cannot be deleted" in str(e) else status.HTTP_404_NOT_FOUND
             return Response({"error": str(e)}, status=status_code)
+
+class ProductStatsView(APIView):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.service = ProductService()
+
+    @extend_schema(
+        parameters=[ProductStatsRequestSerializer],
+        responses={200: ProductStatsResponseSerializer},
+        summary="Get total sold quantity of a product (sum of all its UPCs) for a period"
+    )
+    def get(self, request, id_product):
+        query_params = ProductStatsRequestSerializer(data=request.query_params)
+        query_params.is_valid(raise_exception=True)
+        params = query_params.validated_data
+
+        data = self.service.get_product_sales_stats(
+            id_product=id_product,
+            date_from=params.get('date_from'),
+            date_to=params.get('date_to')
+        )
+        return Response(data, status=status.HTTP_200_OK)

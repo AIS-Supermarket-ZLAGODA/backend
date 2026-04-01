@@ -83,3 +83,12 @@ class ProductService:
                 "Цей товар неможливо видалити, оскільки він зараз наявний на складі магазину. "
                 "Спершу видаліть його зі складу магазину."
             )
+
+    def get_product_sales_stats(self, id_product: int, date_from=None, date_to=None):
+        self.get_product_by_id(id_product)
+
+        total_sold = self.product_repo.get_sold_stats(id_product, date_from, date_to)
+        return {
+            "id_product": id_product,
+            "total_sold": total_sold
+        }

@@ -2,7 +2,7 @@ from django.urls import path
 from .views.TestTableListView import TestTableListView
 from .views.CategoryView import CategoryListView
 from .views.CategoryView import CategoryDetailView
-from .views.ProductView import ProductListView
+from .views.ProductView import ProductListView, ProductStatsView
 from .views.ProductView import ProductDetailView
 from .views.AuthView import LoginView
 from .views.EmployeeView import EmployeeListView, EmployeeDetailView
@@ -16,6 +16,7 @@ urlpatterns = [
     path('categories/', CategoryListView.as_view(), name='category-list'),
     path('categories/<int:category_number>/', CategoryDetailView.as_view(), name='category-detail'),
     path('products/', ProductListView.as_view(), name='product-list'),
+    path('products/<int:id_product>/stats/', ProductStatsView.as_view(), name='product-stats'),
     path('products/<int:id_product>/', ProductDetailView.as_view(), name='product-detail'),
     path('employees/', EmployeeListView.as_view(), name='employee-list'),
     path('employees/<str:id_employee>/', EmployeeDetailView.as_view(), name='employee-detail'),

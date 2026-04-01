@@ -89,3 +89,26 @@ class ProductRepository:
                 columns = [col[0] for col in cursor.description]
                 return dict(zip(columns, row))
             return None
+
+    @staticmethod
+    def get_sold_stats(id_product: int, date_from=None, date_to=None):
+        with connection.cursor() as cursor:
+            query = """
+                    SELECT SUM(s.product_number)
+                    FROM Sale s
+                    INNER JOIN Store_Product sp ON s.UPC = sp.UPC
+                    INNER JOIN "Check" c ON s.check_number = c.check_number
+                    WHERE sp.id_product = %s 
+                    """
+            params = [id_product]
+
+            if date_from:
+                query += " AND c.print_date >= %s"
+                params.append(date_from)
+            if date_to:
+                query += " AND c.print_date <= %s"
+                params.append(date_to)
+
+            cursor.execute(query, params)
+            result = cursor.fetchone()
+            return int(result[0]) if result[0] is not None else 0

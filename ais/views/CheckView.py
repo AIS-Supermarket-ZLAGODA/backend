@@ -5,6 +5,7 @@ from rest_framework.response import Response
 
 from ..serializers.CheckRequestSerializer import CheckRequestSerializer
 from ..serializers.CheckSerializer import CheckSerializer, CheckCreateSerializer
+from ..serializers.CheckSummarySerializer import CheckSummaryResponseSerializer
 from ..services.CheckService import CheckService
 
 
@@ -87,7 +88,7 @@ class CheckSummaryView(APIView):
 
     @extend_schema(
         parameters=[CheckRequestSerializer],
-        responses={200: dict},
+        responses={200: CheckSummaryResponseSerializer},
         summary="Get total sales sum and VAT summary for a period/employee"
     )
     def get(self, request):
