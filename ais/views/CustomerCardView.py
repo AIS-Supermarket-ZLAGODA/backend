@@ -3,6 +3,7 @@ from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
+from ..serializers.CustomerCardRequestSerializer import CustomerCardRequestSerializer
 from ..serializers.CustomerCardSerializer import CustomerCardSerializer
 from ..services.CustomerCardService import CustomerCardService
 
@@ -13,13 +14,22 @@ class CustomerCardListView(APIView):
         self.service = CustomerCardService()
 
     @extend_schema(
+        parameters=[CustomerCardRequestSerializer],
         responses={200: CustomerCardSerializer(many=True)},
         summary="List of all customer cards"
     )
     def get(self, request):
-        surname = request.query_params.get('surname')
+        query_params = CustomerCardRequestSerializer(data=request.query_params)
+        query_params.is_valid(raise_exception=True)
+
+        params = query_params.validated_data
+        surname = params.get('surname')
+        percent = params.get('percent')
+
         if surname:
             data = self.service.search_by_surname(surname)
+        elif percent is not None:
+            data = self.service.get_list_of_customers_by_percent(percent)
         else:
             data = self.service.get_list_of_customers()
         return Response(data, status=status.HTTP_200_OK)

@@ -10,6 +10,9 @@ class CustomerCardService:
     def get_list_of_customers(self):
         return self.repository.get_all()
 
+    def get_list_of_customers_by_percent(self, percent: int):
+        return self.repository.get_all_by_percent(percent)
+
     def get_customer_by_number(self, card_number: str):
         customer = self.repository.get_by_number(card_number)
         if not customer:
