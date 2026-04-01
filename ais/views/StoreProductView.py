@@ -23,15 +23,13 @@ class StoreProductListView(APIView):
         query_params.is_valid(raise_exception=True)
 
         params = query_params.validated_data
-        product_name = params.get('product_name')
 
-        if product_name:
-            data = self.service.search_by_product_name(product_name)
-        else:
-            if params.get('order_by_products_number'):
-                data = self.service.get_list_of_store_products_sorted_by_products_number()
-            else:
-                data = self.service.get_list_of_store_products()
+        data = self.service.get_list_of_store_products(
+            product_name=params.get('product_name'),
+            is_promotional=params.get('promotional_product_filter'),
+            sort_by_quantity=params.get('order_by_products_number')
+        )
+
         return Response(data, status=status.HTTP_200_OK)
 
 

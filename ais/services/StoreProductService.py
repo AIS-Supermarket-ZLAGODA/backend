@@ -6,11 +6,12 @@ class StoreProductService:
     def __init__(self):
         self.repository = StoreProductRepository()
 
-    def get_list_of_store_products(self):
-        return self.repository.get_all()
-
-    def get_list_of_store_products_sorted_by_products_number(self):
-        return self.repository.get_all_sorted_by_products_number()
+    def get_list_of_store_products(self, product_name=None, is_promotional=None, sort_by_quantity=False):
+        return self.repository.get_all(
+            product_name=product_name,
+            is_promotional=is_promotional,
+            sort_by_quantity=sort_by_quantity
+        )
 
     def get_store_product_by_upc(self, upc: str):
         store_product = self.repository.get_by_upc(upc)
