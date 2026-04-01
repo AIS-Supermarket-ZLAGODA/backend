@@ -24,7 +24,7 @@ class StoreProductService:
 
     def add_store_product(self, data: dict):
         self.repository.create(data)
-        return self.repository.get_by_upc(data['UPC'])
+        return self.repository.get_by_upc(data['upc'])
 
     def update_store_product(self, upc: str, data: dict):
         self.get_store_product_by_upc(upc)

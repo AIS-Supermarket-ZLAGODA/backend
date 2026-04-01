@@ -2,8 +2,8 @@ from rest_framework import serializers
 
 
 class StoreProductSerializer(serializers.Serializer):
-    ucp = serializers.CharField(max_length=12)
-    ucp_prom = serializers.CharField(max_length=12, required=False, allow_blank=True, allow_null=True)
+    upc = serializers.CharField(max_length=12)
+    upc_prom = serializers.CharField(max_length=12, required=False, allow_blank=True, allow_null=True)
     id_product = serializers.IntegerField()
     selling_price = serializers.DecimalField(max_digits=13, decimal_places=4)
     products_number = serializers.IntegerField()
