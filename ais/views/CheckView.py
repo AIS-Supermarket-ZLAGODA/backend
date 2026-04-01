@@ -3,6 +3,7 @@ from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
+from ..serializers.CheckRequestSerializer import CheckRequestSerializer
 from ..serializers.CheckSerializer import CheckSerializer, CheckCreateSerializer
 from ..services.CheckService import CheckService
 
@@ -13,12 +14,21 @@ class CheckListView(APIView):
         self.service = CheckService()
 
     @extend_schema(
+        parameters=[CheckRequestSerializer],
         responses={200: CheckSerializer(many=True)},
-        summary="List of all checks"
+        summary="List of checks with filters (by employee and/or date range)"
     )
     def get(self, request):
-        id_employee = request.query_params.get('id_employee')
-        data = self.service.get_list_of_checks(id_employee=id_employee)
+        query_params = CheckRequestSerializer(data=request.query_params)
+        query_params.is_valid(raise_exception=True)
+
+        params = query_params.validated_data
+
+        data = self.service.get_list_of_checks(
+            id_employee=params.get('id_employee'),
+            date_from=params.get('date_from'),
+            date_to=params.get('date_to')
+        )
         return Response(data, status=status.HTTP_200_OK)
 
     @extend_schema(
