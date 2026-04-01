@@ -3,7 +3,7 @@ from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
-from ..serializers.StoreProductSerializer import StoreProductSerializer
+from ..serializers.StoreProductSerializer import StoreProductSerializer, StoreProductDetailSerializer
 from ..serializers.StoreProductRequestSerializer import StoreProductRequestSerializer
 from ..services.StoreProductService import StoreProductService
 
@@ -58,7 +58,7 @@ class StoreProductDetailView(APIView):
         self.service = StoreProductService()
 
     @extend_schema(
-        responses={200: StoreProductSerializer, 404: dict},
+        responses={200: StoreProductDetailSerializer, 404: dict},
         summary="Get store product by UPC"
     )
     def get(self, request, UPC):
