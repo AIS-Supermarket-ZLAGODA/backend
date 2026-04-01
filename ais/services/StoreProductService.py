@@ -9,6 +9,9 @@ class StoreProductService:
     def get_list_of_store_products(self):
         return self.repository.get_all()
 
+    def get_list_of_store_products_sorted_by_products_number(self):
+        return self.repository.get_all_sorted_by_products_number()
+
     def get_store_product_by_upc(self, upc: str):
         store_product = self.repository.get_by_upc(upc)
         if not store_product:

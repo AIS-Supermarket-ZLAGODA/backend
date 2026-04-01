@@ -4,6 +4,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 
 from ..serializers.StoreProductSerializer import StoreProductSerializer
+from ..serializers.StoreProductRequestSerializer import StoreProductRequestSerializer
 from ..services.StoreProductService import StoreProductService
 
 
@@ -13,16 +14,26 @@ class StoreProductListView(APIView):
         self.service = StoreProductService()
 
     @extend_schema(
+        parameters=[StoreProductRequestSerializer],
         responses={200: StoreProductSerializer(many=True)},
         summary="List of all store products"
     )
     def get(self, request):
-        product_name = request.query_params.get('product_name')
+        query_params = StoreProductRequestSerializer(data=request.query_params)
+        query_params.is_valid(raise_exception=True)
+
+        params = query_params.validated_data
+        product_name = params.get('product_name')
+
         if product_name:
             data = self.service.search_by_product_name(product_name)
         else:
-            data = self.service.get_list_of_store_products()
+            if params.get('order_by_products_number'):
+                data = self.service.get_list_of_store_products_sorted_by_products_number()
+            else:
+                data = self.service.get_list_of_store_products()
         return Response(data, status=status.HTTP_200_OK)
+
 
     @extend_schema(
         request=StoreProductSerializer,

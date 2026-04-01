@@ -16,6 +16,24 @@ class StoreProductRepository:
             return [dict(zip(columns, row)) for row in cursor.fetchall()]
 
     @staticmethod
+    def get_all_sorted_by_products_number():
+        with connection.cursor() as cursor:
+            cursor.execute("""
+                           SELECT sp.UPC,
+                                  sp.UPC_prom,
+                                  sp.id_product,
+                                  sp.selling_price,
+                                  sp.products_number,
+                                  sp.promotional_product,
+                                  p.product_name
+                           FROM Store_Product sp
+                                    INNER JOIN Product p ON sp.id_product = p.id_product
+                           ORDER BY sp.products_number DESC;
+                           """)
+            columns = [col[0] for col in cursor.description]
+            return [dict(zip(columns, row)) for row in cursor.fetchall()]
+
+    @staticmethod
     def get_by_upc(upc: str):
         with connection.cursor() as cursor:
             cursor.execute("""
