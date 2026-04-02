@@ -7,6 +7,7 @@ from .views.AuthView import LoginView
 from .views.EmployeeView import EmployeeListView, EmployeeDetailView
 from .views.CheckView import CheckListView, CheckDetailView, CheckSummaryView
 from .views.CustomerCardView import CustomerCardListView, CustomerCardDetailView
+from .views.ReportView import BezukhReportAnalysisView, BezukhReportPromotionalCategoriesView
 from .views.StoreProductView import StoreProductListView, StoreProductDetailView
 
 urlpatterns = [
@@ -25,4 +26,6 @@ urlpatterns = [
     path('customers/<str:card_number>/', CustomerCardDetailView.as_view(), name='customer-detail'),
     path('store-products/', StoreProductListView.as_view(), name='store-product-list'),
     path('store-products/<str:UPC>/', StoreProductDetailView.as_view(), name='store-product-detail'),
+    path('reports/bezukh/sales-analysis/', BezukhReportAnalysisView.as_view(), name='report-bezukh-sales-analysis'),
+    path('reports/bezukh/promotional-categories/', BezukhReportPromotionalCategoriesView.as_view(), name='report-bezukh-promotional-categories'),
 ]
