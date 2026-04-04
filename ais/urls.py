@@ -7,7 +7,8 @@ from .views.AuthView import LoginView
 from .views.EmployeeView import EmployeeListView, EmployeeDetailView
 from .views.CheckView import CheckListView, CheckDetailView, CheckSummaryView
 from .views.CustomerCardView import CustomerCardListView, CustomerCardDetailView
-from .views.ReportView import BezukhReportAnalysisView, BezukhReportPromotionalCategoriesView
+from .views.ReportView import BezukhReportAnalysisView, BezukhReportPromotionalCategoriesView, \
+    ZmeulProducerPerformanceView, ZmeulUniversalCategoriesView
 from .views.StoreProductView import StoreProductListView, StoreProductDetailView
 
 urlpatterns = [
@@ -28,4 +29,6 @@ urlpatterns = [
     path('store-products/<str:UPC>/', StoreProductDetailView.as_view(), name='store-product-detail'),
     path('reports/bezukh/sales-analysis/', BezukhReportAnalysisView.as_view(), name='report-bezukh-sales-analysis'),
     path('reports/bezukh/promotional-categories/', BezukhReportPromotionalCategoriesView.as_view(), name='report-bezukh-promotional-categories'),
+    path('reports/zmeul/producer-performance/', ZmeulProducerPerformanceView.as_view(), name='report-zmeul-producer-performance'),
+    path('reports/zmeul/universal-categories/', ZmeulUniversalCategoriesView.as_view(), name='report-zmeul-universal-categories'),
 ]

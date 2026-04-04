@@ -16,6 +16,14 @@ class ZmeulReportService:
     def __init__(self):
         self.repository = ZmeulReportRepository()
 
+    def get_producer_performance(self, category_name, date_from=None, date_to=None):
+        if not category_name:
+            raise ValueError("category_name is required")
+            
+        return self.repository.get_producer_performance(category_name, date_from, date_to)
+
+    def get_universal_categories(self):
+        return self.repository.get_universal_categories()
 
 class LapkoReportService:
     def __init__(self):
