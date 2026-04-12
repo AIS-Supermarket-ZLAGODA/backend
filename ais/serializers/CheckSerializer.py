@@ -2,7 +2,7 @@ from rest_framework import serializers
 
 
 class SaleItemSerializer(serializers.Serializer):
-    UPC = serializers.CharField(max_length=12)
+    upc = serializers.CharField(max_length=12)
     product_number = serializers.IntegerField(min_value=1)
 
 
@@ -13,7 +13,7 @@ class CheckCreateSerializer(serializers.Serializer):
 
 
 class SaleSerializer(serializers.Serializer):
-    UPC = serializers.CharField()
+    upc = serializers.CharField()
     check_number = serializers.CharField()
     product_number = serializers.IntegerField()
     selling_price = serializers.DecimalField(max_digits=13, decimal_places=4)

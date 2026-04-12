@@ -80,10 +80,10 @@ class CheckRepository:
     def get_sales_by_check(check_number: str):
         with connection.cursor() as cursor:
             cursor.execute("""
-                SELECT s.UPC, s.check_number, s.product_number, s.selling_price,
+                SELECT s.upc, s.check_number, s.product_number, s.selling_price,
                        p.product_name
                 FROM Sale s
-                INNER JOIN Store_Product sp ON s.UPC = sp.UPC
+                INNER JOIN Store_Product sp ON s.upc = sp.upc
                 INNER JOIN Product p ON sp.id_product = p.id_product
                 WHERE s.check_number = %s;
             """, [check_number])
