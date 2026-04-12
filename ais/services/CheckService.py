@@ -38,16 +38,16 @@ class CheckService:
 
             sale_entries = []
             for item in items:
-                upc = item['UPC']
+                upc = item['upc']
                 product_number = item['product_number']
 
                 store_product = self.store_product_repository.get_by_upc(upc)
                 if not store_product:
-                    raise ValueError(f"Товар з UPC {upc} не знайдено в магазині.")
+                    raise ValueError(f"Товар з upc {upc} не знайдено в магазині.")
 
                 if store_product['products_number'] < product_number:
                     raise ValueError(
-                        f"Недостатньо товару з UPC {upc} на складі. "
+                        f"Недостатньо товару з upc {upc} на складі. "
                         f"Доступно: {store_product['products_number']}, запитано: {product_number}."
                     )
 
@@ -56,12 +56,11 @@ class CheckService:
                 sum_total += item_total
 
                 sale_entries.append({
-                    'UPC': upc,
+                    'upc': upc,
                     'product_number': product_number,
                     'selling_price': selling_price,
                 })
 
-            # Apply customer card discount
             if card_number:
                 customer = self.customer_card_repository.get_by_number(card_number)
                 if customer:
@@ -84,12 +83,12 @@ class CheckService:
 
             for entry in sale_entries:
                 self.sale_repository.create(
-                    upc=entry['UPC'],
+                    upc=entry['upc'],
                     check_number=check_number,
                     product_number=entry['product_number'],
                     selling_price=entry['selling_price'],
                 )
-                self.store_product_repository.update_stock(entry['UPC'], -entry['product_number'])
+                self.store_product_repository.update_stock(entry['upc'], -entry['product_number'])
 
             return self.get_check_by_number(check_number)
 
