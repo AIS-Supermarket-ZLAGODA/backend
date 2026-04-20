@@ -28,3 +28,11 @@ class ZmeulProducerPerformanceSerializer(serializers.Serializer):
 class ZmeulUniversalCategoriesSerializer(serializers.Serializer):
     category_number = serializers.IntegerField()
     category_name = serializers.CharField()
+
+class LapkoCustomerSpendingRequestSerializer(serializers.Serializer):
+    category_name = serializers.CharField()
+    date_from = serializers.DateTimeField(required=False, allow_null=True)
+    date_to = serializers.DateTimeField(required=False, allow_null=True)
+
+class LapkoCategoryRequestSerializer(serializers.Serializer):
+    category_name = serializers.CharField()

@@ -8,7 +8,8 @@ from .views.EmployeeView import EmployeeListView, EmployeeDetailView
 from .views.CheckView import CheckListView, CheckDetailView, CheckSummaryView
 from .views.CustomerCardView import CustomerCardListView, CustomerCardDetailView
 from .views.ReportView import BezukhReportAnalysisView, BezukhReportPromotionalCategoriesView, \
-    ZmeulProducerPerformanceView, ZmeulUniversalCategoriesView
+    ZmeulProducerPerformanceView, ZmeulUniversalCategoriesView, \
+    LapkoCustomerSpendingView, LapkoCustomersBoughtAllView
 from .views.StoreProductView import StoreProductListView, StoreProductDetailView
 
 urlpatterns = [
@@ -31,4 +32,6 @@ urlpatterns = [
     path('reports/bezukh/promotional-categories/', BezukhReportPromotionalCategoriesView.as_view(), name='report-bezukh-promotional-categories'),
     path('reports/zmeul/producer-performance/', ZmeulProducerPerformanceView.as_view(), name='report-zmeul-producer-performance'),
     path('reports/zmeul/universal-categories/', ZmeulUniversalCategoriesView.as_view(), name='report-zmeul-universal-categories'),
+    path('reports/lapko/customers-category-spending/', LapkoCustomerSpendingView.as_view(), name='report-lapko-customers-spending'),
+    path('reports/lapko/customers-bought-all/', LapkoCustomersBoughtAllView.as_view(), name='report-lapko-customers-bought-all'),
 ]

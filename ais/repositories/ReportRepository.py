@@ -121,4 +121,74 @@ class ZmeulReportRepository:
             return [dict(zip(columns, row)) for row in cursor.fetchall()]
 
 class LapkoReportRepository:
-    ...
+    @staticmethod
+    def get_customers_category_spending(category_name, date_from=None, date_to=None):
+        with connection.cursor() as cursor:
+            query = """
+                SELECT cc.card_number,
+                       cc.cust_surname,
+                       cc.cust_name,
+                       cc.percent,
+                       COUNT(DISTINCT ch.check_number)          AS total_checks,
+                       SUM(s.product_number)                    AS total_items,
+                       SUM(s.product_number * s.selling_price)  AS total_spent
+                FROM Customer_Card cc
+                INNER JOIN "Check"       ch ON cc.card_number = ch.card_number
+                INNER JOIN Sale          s  ON ch.check_number = s.check_number
+                INNER JOIN Store_Product sp ON s.UPC = sp.UPC
+                INNER JOIN Product       p  ON sp.id_product = p.id_product
+                INNER JOIN Category      c  ON p.category_number = c.category_number
+                WHERE c.category_name = %s
+            """
+            params = [category_name]
+
+            if date_from:
+                query += " AND ch.print_date >= %s"
+                params.append(date_from)
+            if date_to:
+                query += " AND ch.print_date <= %s"
+                params.append(date_to)
+
+            query += """
+                GROUP BY cc.card_number, cc.cust_surname, cc.cust_name, cc.percent
+                ORDER BY total_spent DESC;
+            """
+
+            cursor.execute(query, params)
+            columns = [col[0] for col in cursor.description]
+            return [dict(zip(columns, row)) for row in cursor.fetchall()]
+
+    @staticmethod
+    def get_customers_bought_all_in_category(category_name):
+        with connection.cursor() as cursor:
+            cursor.execute("""
+                SELECT cc.card_number,
+                       cc.cust_surname,
+                       cc.cust_name,
+                       cc.phone_number,
+                       cc.percent
+                FROM Customer_Card cc
+                WHERE NOT EXISTS (
+                    SELECT 1
+                    FROM Product p
+                    INNER JOIN Category c ON p.category_number = c.category_number
+                    WHERE c.category_name = %s
+                      AND NOT EXISTS (
+                          SELECT 1
+                          FROM "Check"       ch
+                          INNER JOIN Sale          s  ON ch.check_number = s.check_number
+                          INNER JOIN Store_Product sp ON s.UPC = sp.UPC
+                          WHERE ch.card_number = cc.card_number
+                            AND sp.id_product  = p.id_product
+                      )
+                )
+                  AND EXISTS (
+                      SELECT 1
+                      FROM Product p2
+                      INNER JOIN Category c2 ON p2.category_number = c2.category_number
+                      WHERE c2.category_name = %s
+                  )
+                ORDER BY cc.cust_surname;
+            """, [category_name, category_name])
+            columns = [col[0] for col in cursor.description]
+            return [dict(zip(columns, row)) for row in cursor.fetchall()]
