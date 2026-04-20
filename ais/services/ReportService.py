@@ -28,3 +28,13 @@ class ZmeulReportService:
 class LapkoReportService:
     def __init__(self):
         self.repository = LapkoReportRepository()
+
+    def get_customers_category_spending(self, category_name, date_from=None, date_to=None):
+        if not category_name:
+            raise ValueError("category_name is required")
+        return self.repository.get_customers_category_spending(category_name, date_from, date_to)
+
+    def get_customers_bought_all_in_category(self, category_name):
+        if not category_name:
+            raise ValueError("category_name is required")
+        return self.repository.get_customers_bought_all_in_category(category_name)
